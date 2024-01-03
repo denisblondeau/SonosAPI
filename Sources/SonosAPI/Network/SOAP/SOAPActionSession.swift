@@ -3,7 +3,7 @@
 //  SonosAPIDemo
 //
 //  Created by Denis Blondeau on 2023-01-12.
-//
+//  Last modified on 2023-12-19.
 
 import Combine
 import Foundation
@@ -33,6 +33,8 @@ public final class SOAPActionSession {
     
     enum Service {
         case avTransport(action: AVTransportAction, url: URL)
+        case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
+        case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
         case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
         
         var action: String {
@@ -42,6 +44,12 @@ public final class SOAPActionSession {
                 return action.rawValue.capitalizingFirstLetter()
                 
             case .zoneGroupTopology(let action, _):
+                return action.rawValue.capitalizingFirstLetter()
+                
+            case .groupRenderingControl(let action, _, _):
+                return action.rawValue.capitalizingFirstLetter()
+                
+            case .renderingControl(action: let action, _, _):
                 return action.rawValue.capitalizingFirstLetter()
             }
         }
@@ -54,6 +62,18 @@ public final class SOAPActionSession {
                     
                 case .getPositionInfo:
                     return "<u:GetPositionInfo xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:GetPositionInfo>"
+                case .next:
+                    return "<u:Next xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:Next>"
+                case .pause:
+                    return "<u:Pause xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:Pause>"
+                case .play:
+                    return "<u:Play xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID><Speed>1</Speed></u:Play>"
+                case .previous:
+                    return "<u:Previous xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:Previous>"
+                case .getTransportInfo:
+                    return "<u:GetTransportInfo xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:GetTransportInfo>"
+                case .getCurrentTransportActions:
+                    return "<u:GetCurrentTransportActions xmlns:u='urn:schemas-upnp-org:service:AVTransport:1'><InstanceID>0</InstanceID></u:GetCurrentTransportActions>"
                 }
                 
             case .zoneGroupTopology(let action, _):
@@ -77,6 +97,21 @@ public final class SOAPActionSession {
                     return ""
                     
                 }
+            case .groupRenderingControl(let action, _, let adjustment):
+                switch action {
+                    
+                case .setRelativeGroupVolume:
+                    return "<u:SetRelativeGroupVolume xmlns:u='urn:schemas-upnp-org:service:GroupRenderingControl:1'><InstanceID>0</InstanceID><Adjustment>\(adjustment)</Adjustment></u:SetRelativeGroupVolume>"
+                }
+                
+            case .renderingControl(let action, _, let adjustment):
+                
+                switch action {
+                   
+                case .setRelativeVolume:
+                    return "<u:SetRelativeVolume xmlns:u='urn:schemas-upnp-org:service:RenderingControl:1'><InstanceID>0</InstanceID><Channel>Master</Channel><Adjustment>\(adjustment)</Adjustment></u:SetRelativeVolume>"
+                }
+               
             }
         }
         
@@ -88,15 +123,26 @@ public final class SOAPActionSession {
                 
             case .zoneGroupTopology(_, let url):
                 return URL(string: "\(url.description)/ZoneGroupTopology/Control")!
+                
+            case .groupRenderingControl(_, let url, _):
+                return URL(string: "\(url.description)/MediaRenderer/GroupRenderingControl/Control")!
+                
+            case .renderingControl(_, url: let url, _):
+                return URL(string: "\(url.description)/MediaRenderer/RenderingControl/Control")!
             }
         }
         
         var serviceType: String {
             switch self {
             case .avTransport:
-                return "urn:schemas-upnp-org:service:AVTransport:1#"
+                return "urn:schemas-upnp-org:service:AVTransport:1"
             case .zoneGroupTopology:
-                return "urn:schemas-upnp-org:service:ZoneGroupTopology:1#"
+                return "urn:schemas-upnp-org:service:ZoneGroupTopology:1"
+            case .groupRenderingControl:
+                return "urn:schemas-upnp-org:service:GroupRenderingControl:1"
+            case .renderingControl:
+                return "urn:schemas-upnp-org:service:RenderingControl:1"
+
             }
         }
     }
@@ -116,8 +162,8 @@ public final class SOAPActionSession {
         let soapBody = "<?xml version='1.0' encoding='utf-8'?><s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'><s:Body>\(service.actionBody)</s:Body></s:Envelope>"
     
         let length = soapBody.count
-        let soapAction = service.serviceType + service.action
-     
+        let soapAction = service.serviceType + "#" + service.action
+        
         Task {
             var request = URLRequest(url: service.controlURL)
         
@@ -132,6 +178,9 @@ public final class SOAPActionSession {
             let httpResponse = response as! HTTPURLResponse
            
             guard httpResponse.statusCode == 200 else {
+                if let xml  = String(data: data, encoding: .utf8) {
+                    print("XML  Source - HTTP Error : \(xml)")
+                }
                 onDataReceived.send(completion: .failure(.urlRequest(httpResponse.statusCode)))
                 return
             }
@@ -140,19 +189,20 @@ public final class SOAPActionSession {
             
             switch service.action {
                 
-            case AVTransportAction.getPositionInfo.rawValue.capitalizingFirstLetter():
-                sourceXML = String(data: data, encoding: .utf8)
-            
+            // Following actions do not have an output value.
+            case "Play", "Pause", "Next", "Previous":
+                onDataReceived.send(completion: .finished)
+                return
+                
             case ZoneGroupTopologyAction.getZoneGroupState.rawValue.capitalizingFirstLetter():
                 sourceXML = String(data: data, encoding: .utf8)?.html2String
-                
+             
             default:
-                onDataReceived.send(completion: .failure(.dataDecoding("Unknown service action to decode.")))
-                return
+                sourceXML = String(data: data, encoding: .utf8)
             }
-            
+         
             guard let sourceXML else {
-                onDataReceived.send(completion: .failure(.dataDecoding("Cannot decode html to xml.")))
+                onDataReceived.send(completion: .failure(.dataDecoding("Cannot decode HTML to XML.")))
                 return
             }
             
@@ -160,6 +210,7 @@ public final class SOAPActionSession {
             let jsonStr = parser.process(action: service.action, xml: sourceXML)
             
             guard let jsonStr else {
+         
                 onDataReceived.send(completion: .failure(.dataDecoding("Cannot parse XML to JSON.")))
                 return
             }
@@ -173,7 +224,21 @@ public final class SOAPActionSession {
 // MARK: - Shared enums
 
 public enum AVTransportAction: String {
+    case getCurrentTransportActions
     case getPositionInfo
+    case getTransportInfo
+    case next
+    case pause
+    case play
+    case previous
+}
+
+public enum GroupRenderingControlAction: String {
+    case setRelativeGroupVolume
+}
+
+public enum RenderingControlAction: String {
+    case setRelativeVolume
 }
 
 public enum ZoneGroupTopologyAction: String {
@@ -186,3 +251,5 @@ public enum ZoneGroupTopologyAction: String {
     case reportUnresponsiveDevice
     case submitDiagnostics
 }
+
+
