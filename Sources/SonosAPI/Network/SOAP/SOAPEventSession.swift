@@ -10,7 +10,7 @@ import Combine
 import Network
 
 /// Sono Service Event.
-final class SOAPEventSession {
+public final class SOAPEventSession {
     
     // MARK: - Enums Start
     

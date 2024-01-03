@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - SonosDevice
-struct SonosDevice: Codable {
+public struct SonosDevice: Codable {
     let cacheControl: String
     let ext: JSONNull?
     let location: String

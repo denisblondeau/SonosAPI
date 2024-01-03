@@ -9,7 +9,7 @@ import Combine
 import Foundation
 
 /// Sonos Service Action.
-final class SOAPActionSession {
+public final class SOAPActionSession {
     
     // MARK: - Enums Start
     

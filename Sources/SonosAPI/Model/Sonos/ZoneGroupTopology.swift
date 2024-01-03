@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - GroupData
-struct ZoneGroupTopology: Codable {
+public struct ZoneGroupTopology: Codable {
     let zoneGroupState: ZoneGroupState
     
     enum CodingKeys: String, CodingKey {

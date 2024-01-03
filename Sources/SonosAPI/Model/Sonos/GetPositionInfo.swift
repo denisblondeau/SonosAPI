@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - GetPositionInfo
-struct GetPositionInfo: Codable {
+public struct GetPositionInfo: Codable {
   let absCount, relCount, track: Int
   let relTime, trackDuration: Date
   let trackMetaData: TrackMetaData?

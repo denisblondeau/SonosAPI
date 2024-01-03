@@ -6,7 +6,7 @@
 //
 
 // MARK: - GroupRenderingControl
-struct GroupRenderingControl: Codable {
+public struct GroupRenderingControl: Codable {
     let groupVolume: Int
     let groupMute, groupVolumeChangeable: Bool
     

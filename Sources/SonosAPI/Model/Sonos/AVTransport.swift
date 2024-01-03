@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - AVTransport
-struct AVTransport: Codable {
+public struct AVTransport: Codable {
     
     let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTrackURI, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
     
