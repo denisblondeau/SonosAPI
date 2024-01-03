@@ -172,11 +172,11 @@ public final class SOAPActionSession {
 
 // MARK: - Shared enums
 
-enum AVTransportAction: String {
+public enum AVTransportAction: String {
     case getPositionInfo
 }
 
-enum ZoneGroupTopologyAction: String {
+public enum ZoneGroupTopologyAction: String {
     case beginsoftwareUpdate
     case checkUpdate
     case getZoneGroupAttributes

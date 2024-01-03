@@ -376,7 +376,7 @@ public final class SOAPEventSession {
 
 // MARK: - Shared enum
 
-enum SonosService: String  {
+public enum SonosService: String  {
     case alarmClock
     case audioIn
     case avTransport
