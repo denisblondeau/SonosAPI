@@ -32,12 +32,12 @@ public final class SOAPActionSession {
     }
     
     enum Service {
-        case avTransport(action: AVTransportAction, url: URL)
-        case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
-        case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
-        case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
+        public case avTransport(action: AVTransportAction, url: URL)
+        public case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
+        public case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
+        public case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
         
-        var action: String {
+        public var action: String {
             switch self {
                 
             case .avTransport(action: let action, _):
@@ -150,14 +150,14 @@ public final class SOAPActionSession {
     // MARK: - Enums End
     
     private var service: Service
-    let onDataReceived = PassthroughSubject<String, SOAPActionError>()
+    public let onDataReceived = PassthroughSubject<String, SOAPActionError>()
     
-    init(service: Service) {
+    public init(service: Service) {
         self.service = service
     }
     
     /// Execute the specified action.
-    func run() {
+    public func run() {
         
         let soapBody = "<?xml version='1.0' encoding='utf-8'?><s:Envelope xmlns:s='http://schemas.xmlsoap.org/soap/envelope/' s:encodingStyle='http://schemas.xmlsoap.org/soap/encoding/'><s:Body>\(service.actionBody)</s:Body></s:Envelope>"
     

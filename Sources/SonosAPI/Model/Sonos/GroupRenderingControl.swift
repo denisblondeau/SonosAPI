@@ -7,8 +7,8 @@
 
 // MARK: - GroupRenderingControl
 public struct GroupRenderingControl: Codable {
-    let groupVolume: Int
-    let groupMute, groupVolumeChangeable: Bool
+    public let groupVolume: Int
+    public let groupMute, groupVolumeChangeable: Bool
     
     enum CodingKeys: String, CodingKey {
         case groupVolume = "GroupVolume"

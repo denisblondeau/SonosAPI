@@ -9,10 +9,10 @@ import Foundation
 
 // MARK: - GetPositionInfo
 public struct GetPositionInfo: Codable {
-  let absCount, relCount, track: Int
-  let relTime, trackDuration: Date
-  let trackMetaData: TrackMetaData?
-  let trackURI, absTime: String
+  public let absCount, relCount, track: Int
+  public let relTime, trackDuration: Date
+  public let trackMetaData: TrackMetaData?
+  public let trackURI, absTime: String
   
   enum CodingKeys: String, CodingKey {
     case track = "Track"

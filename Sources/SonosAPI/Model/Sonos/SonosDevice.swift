@@ -9,10 +9,10 @@ import Foundation
 
 // MARK: - SonosDevice
 public struct SonosDevice: Codable {
-    let cacheControl: String
-    let ext: JSONNull?
-    let location: String
-    var hostURL: URL? {
+    public let cacheControl: String
+    public let ext: JSONNull?
+    public let location: String
+    public var hostURL: URL? {
         if let locationURL = URL(string: location) {
             if let baseURL = getBaseURL(from: locationURL) {
                 return baseURL
@@ -20,10 +20,10 @@ public struct SonosDevice: Codable {
         }
         return nil
     }
-    let server, st, usn, xRinconHousehold: String
-    let xRinconBootseq, bootidUpnpOrg, xRinconWifimode, xRinconVariant: Int
-    let householdSmartspeakerAudio: String
-    let securelocationUpnpOrg, xSonosHhsecurelocation: String
+    public let server, st, usn, xRinconHousehold: String
+    public let xRinconBootseq, bootidUpnpOrg, xRinconWifimode, xRinconVariant: Int
+    public let householdSmartspeakerAudio: String
+    public let securelocationUpnpOrg, xSonosHhsecurelocation: String
     
     enum CodingKeys: String, CodingKey {
         case cacheControl = "CACHE-CONTROL"

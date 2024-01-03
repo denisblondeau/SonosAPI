@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - GroupData
 public struct ZoneGroupTopology: Codable {
-    let zoneGroupState: ZoneGroupState
+    public let zoneGroupState: ZoneGroupState
     
     enum CodingKeys: String, CodingKey {
         case zoneGroupState = "ZoneGroupState"
@@ -17,9 +17,9 @@ public struct ZoneGroupTopology: Codable {
 }
 
 // MARK: - ZoneGroupState
-struct ZoneGroupState: Codable {
-    let vanishedDevices: JSONNull?
-    let zoneGroups: ZoneGroups
+public struct ZoneGroupState: Codable {
+    public let vanishedDevices: JSONNull?
+    public let zoneGroups: ZoneGroups
     
     enum CodingKeys: String, CodingKey {
         case vanishedDevices = "VanishedDevices"
@@ -28,9 +28,9 @@ struct ZoneGroupState: Codable {
 }
 
 // MARK: - ZoneGroups
-struct ZoneGroups: Codable {
+public struct ZoneGroups: Codable {
     /// A list of groups in the household (e.g. zone). Each element is a group object.
-    let zoneGroup: [ZoneGroup]
+    public let zoneGroup: [ZoneGroup]
     
     enum CodingKeys: String, CodingKey {
         case zoneGroup = "ZoneGroup"
@@ -38,12 +38,12 @@ struct ZoneGroups: Codable {
 }
 
 // MARK: - ZoneGroup
-struct ZoneGroup: Codable {
+public struct ZoneGroup: Codable {
     /// The ID of the player acting as the group coordinator for the group. This is a playerId value.
-    let coordinator: String
+    public let coordinator: String
     /// The ID of the group.
-    let id: String
-    let zoneGroupMember: [ZoneGroupMember]
+    public let id: String
+    public let zoneGroupMember: [ZoneGroupMember]
     
     enum CodingKeys: String, CodingKey {
         case coordinator = "@Coordinator"
@@ -69,27 +69,27 @@ struct ZoneGroup: Codable {
 }
 
 // MARK: - ZoneGroupMember
-struct ZoneGroupMember: Codable {
-    let uuid: String
-    let location: String
+public struct ZoneGroupMember: Codable {
+    public let uuid: String
+    public let location: String
     /// The display name for the room of the device, such as “Living Room” .
-    let zoneName: String
-    let icon: String
-    let configuration: Int
+    public let zoneName: String
+    public let icon: String
+    public let configuration: Int
     /// The version of the software running on the device.
-    let softwareVersion: String
-    let swGen: Int
-    let minCompatibleVersion, legacyCompatibleVersion: String
-    let bootSeq, tvConfigurationError, hdmiCecAvailable, wirelessMode: Int
-    let wirelessLeafOnly, channelFreq, behindWifiExtender, wifiEnabled: Int
-    let ethLink, orientation, roomCalibrationState, secureRegState: Int
-    let voiceConfigState, micEnabled, airPlayEnabled, idleState: Int
-    let moreInfo: String
-    let sslPort, hhsslPort: Int
-    let htSatChanMapSet: String?
-    let satellite: [ZoneGroupMember]?
-    let invisible: Int?
-    var hostURL: URL? {
+    public let softwareVersion: String
+    public let swGen: Int
+    public let minCompatibleVersion, legacyCompatibleVersion: String
+    public let bootSeq, tvConfigurationError, hdmiCecAvailable, wirelessMode: Int
+    public let wirelessLeafOnly, channelFreq, behindWifiExtender, wifiEnabled: Int
+    public let ethLink, orientation, roomCalibrationState, secureRegState: Int
+    public let voiceConfigState, micEnabled, airPlayEnabled, idleState: Int
+    public let moreInfo: String
+    public let sslPort, hhsslPort: Int
+    public let htSatChanMapSet: String?
+    public let satellite: [ZoneGroupMember]?
+    public let invisible: Int?
+    public var hostURL: URL? {
         if let locationURL = URL(string: location) {
             if let baseURL = getBaseURL(from: locationURL) {
                 return baseURL

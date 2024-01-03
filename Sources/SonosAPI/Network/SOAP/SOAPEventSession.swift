@@ -40,7 +40,7 @@ public final class SOAPEventSession {
         }
     }
     
-    enum SonosEvents {
+    public enum SonosEvents {
         
         case subscription(service: SonosService)
         
@@ -117,7 +117,7 @@ public final class SOAPEventSession {
         return parameters
     }()
     
-    let onDataReceived = PassthroughSubject<JSONData, SOAPEventError>()
+    public let onDataReceived = PassthroughSubject<JSONData, SOAPEventError>()
     
     init(serviceEvents: [SonosEvents], hostURL: URL, callbackURL: URL) {
         
@@ -131,7 +131,7 @@ public final class SOAPEventSession {
     }
     
     /// Start listening to events..
-    func run() {
+    public func run() {
         
         setupListener()
     }

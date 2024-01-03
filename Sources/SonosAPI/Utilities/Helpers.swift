@@ -35,7 +35,7 @@ func getBaseURL(from url: URL) -> URL? {
 /// - Parameters:
 ///   - json: JSON data to decode.
 ///   - completion: New struct of type T or nil if decoding error.
-func parseJSONToObject<T: Decodable>(json: String, completion: @escaping (T?) -> ())  {
+public func parseJSONToObject<T: Decodable>(json: String, completion: @escaping (T?) -> ())  {
     
     // Set to true to view debug information (JSON decoding failure).
     let debug = true

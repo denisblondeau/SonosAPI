@@ -10,15 +10,15 @@ import Foundation
 // MARK: - AVTransport
 public struct AVTransport: Codable {
     
-    let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTrackURI, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
+    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTrackURI, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
     
-    let currentTrackMetaData: CurrentTrackMetaData?
-    let nextTrackMetaData: NextTrackMetaData?
-    let avTransportURIMetaData: TransportURIMetaData?
-    let enqueuedTransportURIMetaData: EnqueuedTransportURIMetaData?
-    let currentCrossfadeMode, alarmRunning, snoozeRunning, restartPending: Bool
-    let numberOfTracks, currentTrack, currentSection: Int
-    let currentTrackDuration, currentMediaDuration: Date
+    public let currentTrackMetaData: CurrentTrackMetaData?
+    public let nextTrackMetaData: NextTrackMetaData?
+    public let avTransportURIMetaData: TransportURIMetaData?
+    public let enqueuedTransportURIMetaData: EnqueuedTransportURIMetaData?
+    public let currentCrossfadeMode, alarmRunning, snoozeRunning, restartPending: Bool
+    public let numberOfTracks, currentTrack, currentSection: Int
+    public let currentTrackDuration, currentMediaDuration: Date
     
     enum CodingKeys: String, CodingKey {
         case transportState = "TransportState"

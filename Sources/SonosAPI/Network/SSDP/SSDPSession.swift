@@ -11,7 +11,7 @@ import Network
 
 
 /// Discover Sonos players on the local network (multicast broadcast ).
-final class SSDPSession {
+public final class SSDPSession {
     
     enum SSDPError: LocalizedError, Identifiable {
         var id: String { localizedDescription }
