@@ -16,7 +16,7 @@ public struct GroupRenderingControl: Codable {
         case groupVolumeChangeable = "GroupVolumeChangeable"
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var value = try container.decode(String.self, forKey: .groupVolume)
         groupVolume = Int(value) ?? 0

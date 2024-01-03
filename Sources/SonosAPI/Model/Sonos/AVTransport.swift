@@ -59,7 +59,7 @@ public struct AVTransport: Codable {
         case possibleRecordQualityModes = "PossibleRecordQualityModes"
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         transportState = try container.decode(String.self, forKey: .transportState)
         currentPlayMode = try container.decode(String.self, forKey: .currentPlayMode)
