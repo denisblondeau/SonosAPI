@@ -139,7 +139,7 @@ final class EventParser {
 
 // MARK: - Shared structure
 
-struct JSONData {
+public struct JSONData {
     let sonosService: SonosService
     let json: String
 }

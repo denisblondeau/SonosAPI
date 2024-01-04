@@ -13,8 +13,8 @@ public final class SOAPActionSession {
     
     // MARK: - Enums Start
     
-    enum SOAPActionError: LocalizedError, Identifiable {
-        var id: String { localizedDescription }
+    public enum SOAPActionError: LocalizedError, Identifiable {
+        public var id: String { localizedDescription }
         
         case dataDecoding(String)
         case urlRequest(Int)
@@ -31,11 +31,11 @@ public final class SOAPActionSession {
         }
     }
     
-    enum Service {
-        public case avTransport(action: AVTransportAction, url: URL)
-        public case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
-        public case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
-        public case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
+    public enum Service {
+        case avTransport(action: AVTransportAction, url: URL)
+        case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
+        case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
+        case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
         
         public var action: String {
             switch self {

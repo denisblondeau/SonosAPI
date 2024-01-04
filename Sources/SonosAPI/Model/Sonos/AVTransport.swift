@@ -132,10 +132,10 @@ public struct AVTransport: Codable {
 }
 
 // MARK: - CurrentTrackMetaData
-struct CurrentTrackMetaData: Codable {
-    let res, streamContent, radioShowMd, streamInfo: String
-    let albumArtURI, title, class_, creator: String
-    let album: String
+public struct CurrentTrackMetaData: Codable {
+    public let res, streamContent, radioShowMd, streamInfo: String
+    public let albumArtURI, title, class_, creator: String
+    public let album: String
     
     enum CodingKeys: String, CodingKey {
         case res
@@ -151,9 +151,9 @@ struct CurrentTrackMetaData: Codable {
 }
 
 // MARK: - EnqueuedTransportURIMetaData
-struct EnqueuedTransportURIMetaData: Codable {
-    let title, class_, desc: String
-    let albumArtURI: String
+public struct EnqueuedTransportURIMetaData: Codable {
+    public let title, class_, desc: String
+    public let albumArtURI: String
     
     enum CodingKeys: String, CodingKey {
         case title = "dc:title"
@@ -164,9 +164,9 @@ struct EnqueuedTransportURIMetaData: Codable {
 }
 
 // MARK: - NextTrackMetaData
-struct NextTrackMetaData: Codable {
-    let res, albumArtURI, title, class_: String
-    let creator, album: String
+public struct NextTrackMetaData: Codable {
+    public let res, albumArtURI, title, class_: String
+    public let creator, album: String
     
     enum CodingKeys: String, CodingKey {
         case res
@@ -179,10 +179,10 @@ struct NextTrackMetaData: Codable {
 }
 
 // MARK: - TransportURIMetaData
-struct TransportURIMetaData: Codable {
-    let title, class_: String
-    let albumArtURI: String
-    let desc: String
+public struct TransportURIMetaData: Codable {
+    public let title, class_: String
+    public let albumArtURI: String
+    public let desc: String
     
     enum CodingKeys: String, CodingKey {
         case title = "dc:title"

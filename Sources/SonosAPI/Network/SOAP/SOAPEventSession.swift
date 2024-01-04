@@ -14,8 +14,8 @@ public final class SOAPEventSession {
     
     // MARK: - Enums Start
     
-    enum SOAPEventError: LocalizedError, Identifiable {
-        var id: String { localizedDescription }
+    public enum SOAPEventError: LocalizedError, Identifiable {
+        public var id: String { localizedDescription }
         
         case dataDecoding(String)
         case httpResponse(Int)

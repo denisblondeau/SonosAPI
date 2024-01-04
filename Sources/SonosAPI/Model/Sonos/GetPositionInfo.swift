@@ -48,9 +48,9 @@ public struct GetPositionInfo: Codable {
 }
 
 // MARK: - TrackMetaData
-struct TrackMetaData: Codable {
-  let res, streamContent, albumArtURI, title: String
-  let class_, creator, album: String
+public struct TrackMetaData: Codable {
+  public let res, streamContent, albumArtURI, title: String
+  public let class_, creator, album: String
   
   enum CodingKeys: String, CodingKey {
     case res

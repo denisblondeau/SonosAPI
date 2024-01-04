@@ -51,7 +51,7 @@ public struct ZoneGroup: Codable {
         case zoneGroupMember = "ZoneGroupMember"
     }
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         coordinator = try container.decode(String.self, forKey: .coordinator)
         id = try container.decode(String.self, forKey: .id)
