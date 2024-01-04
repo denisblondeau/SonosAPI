@@ -137,7 +137,7 @@ public final class SOAPEventSession {
     }
     
     /// Cancel subscriptions and listener on demand.
-    func cancel() {
+    public func cancel() {
         Task {
             do {
                 renewSubscriptionTimer?.invalidate()
