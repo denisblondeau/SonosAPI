@@ -61,9 +61,10 @@ public struct AVTransport: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        transportState = try container.decode(String.self, forKey: .transportState)
+        var value =  try container.decodeIfPresent(String.self, forKey: .transportState)
+        transportState = value ?? ""
         currentPlayMode = try container.decode(String.self, forKey: .currentPlayMode)
-        var value = try container.decodeIfPresent(String.self, forKey: .currentCrossfadeMode)
+        value = try container.decodeIfPresent(String.self, forKey: .currentCrossfadeMode)
         currentCrossfadeMode = (Int(value ?? "0") == 1)
         value = try container.decodeIfPresent(String.self, forKey: .numberOfTracks)
         numberOfTracks = Int(value ?? "") ?? 0
