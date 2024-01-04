@@ -22,7 +22,7 @@ public final class SOAPEventSession {
         case urlRequest(Error)
         case genericError(String)
         
-        var description: String {
+        public var description: String {
             switch self {
                 
             case .httpResponse(let statusCode):
@@ -119,7 +119,7 @@ public final class SOAPEventSession {
     
     public let onDataReceived = PassthroughSubject<JSONData, SOAPEventError>()
     
-    init(serviceEvents: [SonosEvents], hostURL: URL, callbackURL: URL) {
+    public init(serviceEvents: [SonosEvents], hostURL: URL, callbackURL: URL) {
         
         self.serviceEvents = serviceEvents
         self.callbackURL = callbackURL

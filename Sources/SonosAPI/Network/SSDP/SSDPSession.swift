@@ -53,7 +53,7 @@ public final class SSDPSession {
     }()
     private var parserSubscription: AnyCancellable?
     
-    let onDeviceFound = PassthroughSubject<SonosDevice, SSDPError>()
+    public let onDeviceFound = PassthroughSubject<SonosDevice, SSDPError>()
     
     /// Initiates multicast request.
     func run() throws {

@@ -19,7 +19,7 @@ public final class SOAPActionSession {
         case dataDecoding(String)
         case urlRequest(Int)
         
-        var description: String {
+        public var description: String {
             switch self {
                 
             case .dataDecoding(let errorMessage):
