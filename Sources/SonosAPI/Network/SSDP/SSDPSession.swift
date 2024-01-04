@@ -13,8 +13,8 @@ import Network
 /// Discover Sonos players on the local network (multicast broadcast ).
 public final class SSDPSession {
     
-    enum SSDPError: LocalizedError, Identifiable {
-        var id: String { localizedDescription }
+    public enum SSDPError: LocalizedError, Identifiable {
+        public var id: String { localizedDescription }
         
         case invalidContent
         case multicastCreation(Error)
@@ -22,7 +22,7 @@ public final class SSDPSession {
         case stateUpdate(Error)
         case genericError(String)
         
-        var description: String {
+        public var description: String {
             switch self {
             case .invalidContent:
                 return "Invalid content received from upnp device."
