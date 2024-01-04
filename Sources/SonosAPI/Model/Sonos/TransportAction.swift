@@ -16,5 +16,9 @@ public struct TransportAction: Codable {
     enum CodingKeys: String, CodingKey {
         case actions = "Actions"
     }
+    
+    public init(actions: String) {
+        self.actions = actions
+    }
 }
 
