@@ -14,19 +14,16 @@ final class ActionParser {
         
         switch action {
             
-        case AVTransportAction.getPositionInfo.rawValue.capitalizingFirstLetter():
-            return processGetPositionInfo(xml: sourceXML)
-            
         case ZoneGroupTopologyAction.getZoneGroupState.rawValue.capitalizingFirstLetter():
             let parser = ParseXMLToJSON(xml: sourceXML)
             return parser.parseXML()
             
         default:
-            return nil
+            return processInfo(xml: sourceXML)
         }
     }
     
-    private func processGetPositionInfo(xml: String) -> String? {
+    private func processInfo(xml: String) -> String? {
         
         guard let doc = try? XMLDocument(xmlString: xml) else { return  nil }
         guard let node = try? doc.nodes(forXPath: "/s:Envelope[1]/s:Body[1]")[0] else { return nil }
