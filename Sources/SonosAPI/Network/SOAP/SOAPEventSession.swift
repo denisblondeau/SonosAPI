@@ -106,7 +106,8 @@ public final class SOAPEventSession {
     private var serviceEvents: [SonosEvents]
     private var listener: NWListener!
     private var subscriptionSID = [String]()
-    private var subscriptionTimeout = 86400 // 86400 seconds = 24 hrs.
+//    private var subscriptionTimeout = 86400 // 86400 seconds = 24 hrs.
+    private var subscriptionTimeout = 3600 // 86400 seconds = 1 hr.
     private var renewSubscriptionTimer: Timer?
     private var callbackURL: URL
     private var hostURL: URL
@@ -325,8 +326,8 @@ public final class SOAPEventSession {
             }
         }
         
-        // Set up subscription renewal - Rewnew 1 minute before end of current subscription.
-        renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: Double(subscriptionTimeout - 60), repeats: true) { timer in
+        // Set up subscription renewal - Rewnew 5 minutes before end of current subscription.
+        renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: Double(subscriptionTimeout - 300), repeats: true) { timer in
             Task {
                 do {
                     try await self.renewSubscriptions()
