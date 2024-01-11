@@ -268,7 +268,6 @@ public final class SOAPEventSession {
                 return
             }
             
-            print(subscriptionSID[index])
             request = URLRequest(url: serviceURL)
             request.httpMethod = "SUBSCRIBE"
             request.addValue("\(subscriptionSID[index])", forHTTPHeaderField: "SID")
