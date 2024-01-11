@@ -363,8 +363,8 @@ public final class SOAPEventSession {
             
             let httpResponse = response as! HTTPURLResponse
             
-//            guard (httpResponse.statusCode == 200) || (httpResponse.statusCode == 412) else {
-            guard (httpResponse.statusCode == 200)  else {
+            // MARK: - Why a 412 UPnP error? "Precondition Failed. An SID does not correspond to a known, un-expired subscription; or the SID header field is missing or empty."
+            guard (httpResponse.statusCode == 200) || (httpResponse.statusCode == 412) else {
                 
                 onDataReceived.send(completion: .failure(.httpResponse(httpResponse.statusCode)))
                 return
