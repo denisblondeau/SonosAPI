@@ -323,11 +323,17 @@ public final class SOAPEventSession {
     /// - Parameter events: Sonos events to subscribe to.
     public func subscribeToEvents(events: [SonosEvent])  {
         
-        guard listener.state == .ready  else {
-            onDataReceived.send(completion: .failure(.genericError("Event listerner is not ready -  Cannot subscribe to events.")))
-            return
-        }
         
+        // Give time to the listener to be ready, if it just got started.
+        if listener.state != .ready {
+            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) { (timer) in
+                guard self.listener.state == .ready  else {
+                    self.onDataReceived.send(completion: .failure(.genericError("Event listerner is not ready -  Cannot subscribe to events.")))
+                    return
+                }
+            }
+        }
+      
         guard hostURL != nil else {
             return
         }
