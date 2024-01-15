@@ -117,13 +117,11 @@ public final class SOAPEventSession {
         return parameters
     }()
     
-    
     /// Publisher for Sonos events and various messages (errors, etc.)
     public let onDataReceived = PassthroughSubject<JSONData, SOAPEventError>()
     
     public init(callbackURL: URL) {
         
-        //        self.serviceEvents = serviceEvents
         self.callbackURL = callbackURL
         setupListener()
         
@@ -141,7 +139,6 @@ public final class SOAPEventSession {
         }
     }
     
-    
     /// Set up environment.
     public func setup(hostURL: URL) {
         
@@ -150,7 +147,6 @@ public final class SOAPEventSession {
         // Cancel previous subscriptions.
         unsubscribeFromEvents()
     }
-    
     
     /// Initialise and start the event listener.
     private func setupListener() {
@@ -163,7 +159,6 @@ public final class SOAPEventSession {
             listener = try NWListener(using: parameters, on: port)
         } catch {
             fatalError("func \(#function): Cannot create event listener: (\(error.localizedDescription)")
-            
         }
         
         listener.stateUpdateHandler = { state in
@@ -244,7 +239,6 @@ public final class SOAPEventSession {
         listener.start(queue: .main)
     }
     
-    
     /// Renew events subscriptions.
     private func renewSubscriptions() {
         
@@ -318,11 +312,9 @@ public final class SOAPEventSession {
         }
     }
     
-    
     /// Subscribe to Sonos events. Subscribing to events do not remove or replace  subscriptions already in place.
     /// - Parameter events: Sonos events to subscribe to.
     public func subscribeToEvents(events: [SonosEvent])  {
-        
         
         // Give time to the listener to be ready, if it just got started.
         if listener.state != .ready {
@@ -419,7 +411,6 @@ public final class SOAPEventSession {
                 }
             }
         }
-        
     }
     
     /// Unsubscribe from all subscriibed events.
