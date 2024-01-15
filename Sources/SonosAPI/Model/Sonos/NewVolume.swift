@@ -7,16 +7,16 @@ import Foundation
 
 // MARK: - NewVolume
 public struct NewVolume: Codable {
-    public let newVolume: Int
+    public let volume: Int
 
     enum CodingKeys: String, CodingKey {
-        case newVolume = "NewVolume"
+        case volume = "NewVolume"
     }
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var value = try container.decode(String.self, forKey: .newVolume)
-        newVolume = Int(value) ?? 0
+        let value = try container.decode(String.self, forKey: .volume)
+        volume = Int(value) ?? 0
     }
 }
 
