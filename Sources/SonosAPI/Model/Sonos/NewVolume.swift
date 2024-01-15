@@ -6,7 +6,7 @@
 import Foundation
 
 // MARK: - NewVolume
-struct NewVolume: Codable {
+public struct NewVolume: Codable {
     let newVolume: Int
 
     enum CodingKeys: String, CodingKey {
