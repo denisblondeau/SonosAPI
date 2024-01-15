@@ -7,7 +7,7 @@ import Foundation
 
 // MARK: - NewVolume
 public struct NewVolume: Codable {
-    let newVolume: Int
+    public let newVolume: Int
 
     enum CodingKeys: String, CodingKey {
         case newVolume = "NewVolume"

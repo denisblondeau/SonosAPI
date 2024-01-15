@@ -15,7 +15,7 @@ This API is functional but currently only implements a few of the available API 
 
 * This API currently only supports MacOS *
 
-To install this package in Xcode: Specify https://github.com/denisblondeau/SonosAPI as a package dependency.
+To install this package in Xcode: Specify https://github.com/denisblondeau/SonosAPI as a package dependency. Thee most stable version can be found under Releases (i.e. 1.0.1, etc.). The main branch is considered experimental and not as stable as the latest release.
 
 Coding environment for this package:
  - MacOS 14.2.1
