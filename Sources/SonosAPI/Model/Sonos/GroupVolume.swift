@@ -6,7 +6,7 @@
 import Foundation
 
 // MARK: - GroupVolume
-struct GroupVolume: Codable {
+public struct GroupVolume: Codable {
     public let currentVolume: Int
 
     enum CodingKeys: String, CodingKey {
