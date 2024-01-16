@@ -100,10 +100,13 @@ public final class SOAPActionSession {
             case .groupRenderingControl(let action, _, let adjustment):
                 switch action {
                     
+                case .getGroupVolume:
+                    return "<u:GetGroupVolume xmlns:u='urn:schemas-upnp-org:service:GroupRenderingControl:1'><InstanceID>0</InstanceID></u:GetGroupVolume>"
+                    
                 case .setRelativeGroupVolume:
                     return "<u:SetRelativeGroupVolume xmlns:u='urn:schemas-upnp-org:service:GroupRenderingControl:1'><InstanceID>0</InstanceID><Adjustment>\(adjustment)</Adjustment></u:SetRelativeGroupVolume>"
                 }
-                
+                    
             case .renderingControl(let action, _, let adjustment):
                 
                 switch action {
@@ -234,6 +237,7 @@ public enum AVTransportAction: String {
 }
 
 public enum GroupRenderingControlAction: String {
+    case getGroupVolume
     case setRelativeGroupVolume
 }
 
