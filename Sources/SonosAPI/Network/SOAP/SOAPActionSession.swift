@@ -33,8 +33,8 @@ public final class SOAPActionSession {
     
     public enum Service {
         case avTransport(action: AVTransportAction, url: URL)
-        case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int)
-        case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int)
+        case groupRenderingControl(action: GroupRenderingControlAction, url: URL, adjustment: Int = 0)
+        case renderingControl(action: RenderingControlAction, url: URL, adjustment: Int = 0)
         case zoneGroupTopology(action: ZoneGroupTopologyAction, url: URL)
         
         public var action: String {
