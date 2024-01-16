@@ -18,15 +18,15 @@ public final class SOAPEventSession {
         public var id: String { localizedDescription }
         
         case dataDecoding(String)
-        case httpResponse(Int)
+        case httpResponse(String, Int)
         case urlRequest(Error)
         case genericError(String)
         
         public var description: String {
             switch self {
                 
-            case .httpResponse(let statusCode):
-                return "Cannot subscribe/unsubscribe to/from host. HTTP response code: \(statusCode)"
+            case .httpResponse(let errorType, let statusCode):
+                return "\(errorType). HTTP response code: \(statusCode)"
                 
             case .urlRequest(let error):
                 return "Cannot subscribe/unsubscribe to/from host. Invalud URL request: \(error.localizedDescription)"
@@ -276,7 +276,7 @@ public final class SOAPEventSession {
                             let httpResponse = response as! HTTPURLResponse
                             
                             guard httpResponse.statusCode == 200 else {
-                                return (event.service, .httpResponse(httpResponse.statusCode))
+                                return (event.service, .httpResponse("Cannot renew subscriptions", httpResponse.statusCode))
                             }
                             
                             if let sid = httpResponse.value(forHTTPHeaderField: "SID") {
@@ -370,7 +370,7 @@ public final class SOAPEventSession {
                             let httpResponse = response as! HTTPURLResponse
                             
                             guard httpResponse.statusCode == 200 else {
-                                return (event.service, .httpResponse(httpResponse.statusCode))
+                                return (event.service, .httpResponse("Cannot subscribe to events", httpResponse.statusCode))
                             }
                             
                             if let sid = httpResponse.value(forHTTPHeaderField: "SID") {
@@ -461,7 +461,7 @@ public final class SOAPEventSession {
                             let httpResponse = response as! HTTPURLResponse
                             // MARK: - Why a 412 UPnP error on last SID being unsubscribed? "Precondition Failed. An SID does not correspond to a known, un-expired subscription; or the SID header field is missing or empty."
                             guard (httpResponse.statusCode == 200) || (httpResponse.statusCode == 412) else {
-                                return (event.service, .httpResponse(httpResponse.statusCode))
+                                return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                             }
                         } catch {
                             return (event.service, .urlRequest(error))
