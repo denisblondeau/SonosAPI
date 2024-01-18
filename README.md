@@ -1,22 +1,53 @@
- # Sonos API (Unsupported/Unofficial)
+<div align="center">
 
-This Swift package uses unsupported (i.e. unofficial) Sonos API requests to access Sonos devices on the local network. 
+  <h1>Sonos API (Unsupported/Unofficial)</h1>
+  
+  <p>
+    This Swift package uses unsupported (i.e. unofficial) Sonos API requests to access Sonos devices on the local network.
 
-Really useful information regarding the unofficial API: https://svrooij.io/sonos-api-docs/
+  </p>
+  
+  
+<!-- Badges -->
+<p>
+  
+  ![Static Badge](https://img.shields.io/badge/macOS-14%2B-greeen)
+  ![Static Badge](https://img.shields.io/badge/Xcode-15%2B-blue)
 
-If you are interested... How to get started with the official Sonos API: https://developer.sonos.com
-The issue with the official API is that you need to send network requests to Sonos's servers - i.e. it is a not a local network API. So this incurs network latency, uses your Internet bandwidth, requires setting up a web server, etc, etc. Works really well but painful to use.
+</p>
+</div>
+<br />
 
-* As this is an unofficial API, this code may break at any time. You may have to tweak the different Sonos models (e.g. AVTransport, GroupRenderingControl, etc.). The network data retrieved is in XML, converted to JSON and then decoded to Swift structures. There is a lot of custom code to do this and the XML conversion is currently not as reliable as it should be.
+## About the Project
 
-To learn out in how to use this API, look at the demo at: https://github.com/denisblondeau/SonosAPIDemo
+The issue with the official API is that you need to send network requests to Sonos's servers - i.e. it is a not a local network API. This incurs network latency, uses your Internet bandwidth, requires setting up a web server, etc, etc. Works really well but painful to use.
 
-This API is functional but currently only implements a few of the available API calls; there is a lot more that can be done.
+- As this is an unofficial API, this code may break at any time. You may have to tweak the different Sonos models (e.g. AVTransport, GroupRenderingControl, etc.). The network data retrieved is in XML, converted to JSON and then decoded to Swift structures.
 
-* This API currently only supports MacOS *
+- This API is functional but curently only implements a few of the available API calls; there is a lot more that can be done.
 
-To install this package in Xcode: Specify https://github.com/denisblondeau/SonosAPI as a package dependency. The most stable version can be found under Releases (i.e. 1.0.1, etc.). The main branch is considered experimental and not as stable as the latest release.
+### Installation
 
-Coding environment for this package:
- - MacOS 14.2.1
- - Xcode 15.1
+To install this package in Xcode: Specify https://github.com/denisblondeau/SonosAPI as a package dependency. The most stable version can be found under Releases (i.e. 1.0.1, etc.). The main branch is considered experimental and is not as stable as the latest release.
+
+### Demo
+
+To see an example on how to use this API, try the demo found at: https://github.com/denisblondeau/SonosAPIDemo
+
+## Roadmap
+
+- [x] Functional, basic API.
+- [ ] More demos.
+- [ ] Documentation.
+- [ ] Full Sonos API implementation.
+
+## License
+
+Distributed under the MIT License. See LICENSE.txt for more information.
+
+## Acknowledgements
+
+Useful resources and libraries.
+
+- [Really useful information regarding the unofficial API](https://svrooij.io/sonos-api-docs/)
+- [If you are interested... How to get started with the official Sonos API](https://developer.sonos.com)
