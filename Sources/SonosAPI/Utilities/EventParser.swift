@@ -57,7 +57,7 @@ final class EventParser {
         for (index, child) in children.enumerated() {
             
             guard let element = child as? XMLElement else { return nil }
-            guard let key = element.name, let value = element.attribute(forName: "val")?.stringValue else { return nil }
+            guard let key = element.name, var value = element.attribute(forName: "val")?.stringValue else { return nil }
             
             if value.prefix(1) == "<" {
                 
@@ -71,6 +71,10 @@ final class EventParser {
                 json += "}, "
                 
             } else {
+                
+                // Double-quotes (") are not escaped by \ in value - Replace double quote by escaped double-quotes \"
+                value = value.replacingOccurrences(of: "\"", with: "\\\"")
+               
                 json += "\"\(key)\": \"\(value)\""
                 if (index < children.count - 1) {
                     json += ", "
@@ -79,7 +83,6 @@ final class EventParser {
         }
         
         json += "}"
-        //  print(json)
         return json
         
         func processXML(xml: String) -> String? {
@@ -95,7 +98,10 @@ final class EventParser {
             for (index, child) in children.enumerated() {
                 
                 guard let element = child as? XMLElement else { return nil }
-                guard let key = element.name, let value = element.stringValue else { return nil }
+                guard let key = element.name, var value = element.stringValue else { return nil }
+             
+                // Double-quotes (") are not escaped by \ in value - Replace double quote by escaped double-quotes \"
+                value = value.replacingOccurrences(of: "\"", with: "\\\"")
                 
                 json += "\"\(key)\": \"\(value)\""
                 

@@ -16,7 +16,6 @@
 
 </p>
 </div>
-<br />
 
 ## About the Project
 
@@ -50,4 +49,4 @@ Distributed under the MIT License. See LICENSE.txt for more information.
 Useful resources and libraries.
 
 - [Really useful information regarding the unofficial API](https://svrooij.io/sonos-api-docs/)
-- [If you are interested... How to get started with the official Sonos API](https://developer.sonos.com)
+- [How to get started with the official Sonos API](https://developer.sonos.com)
