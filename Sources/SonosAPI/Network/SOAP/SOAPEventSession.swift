@@ -106,7 +106,7 @@ public final class SOAPEventSession {
     private var serviceEvents = [SonosEvent]()
     private var listener: NWListener!
     private var subscriptionSID = [String]()
-    private var subscriptionTimeout = 24 * 3600 // 3600 seconds = 1 hr.
+    private var subscriptionTimeout = 1 * 3600 // 3600 seconds = 1 hr.
     private var renewSubscriptionTimer: Timer?
     private var callbackURL: URL
     private var hostURL: URL?
@@ -135,9 +135,6 @@ public final class SOAPEventSession {
         }
     }
     
-    deinit {
-     
-    }
     
     /// Set up environment.
     public func setup(hostURL: URL) {
@@ -257,7 +254,7 @@ public final class SOAPEventSession {
                 var childTaskErrors = [SonosService: SOAPEventError]()
                 
                 for (index, event) in serviceEvents.enumerated() {
-                    
+                   
                     let serviceURL = URL(string: hostURL!.description + event.eventSubscriptionEndpoint)
                     guard let serviceURL else {
                         return [event.service: .genericError("\(#function) - Cannot create service URL.")]
@@ -271,10 +268,10 @@ public final class SOAPEventSession {
                         request.addValue("Second-\(self.subscriptionTimeout)", forHTTPHeaderField: "TIMEOUT")
                         
                         do {
+                        
                             let (_, response) = try await URLSession.shared.data(for: request)
-                            
                             let httpResponse = response as! HTTPURLResponse
-                            
+        
                             guard httpResponse.statusCode == 200 else {
                                 return (event.service, .httpResponse("Cannot renew subscriptions", httpResponse.statusCode))
                             }
@@ -292,6 +289,9 @@ public final class SOAPEventSession {
                         // As there is no error...
                         return(nil, nil)
                     }
+            
+                    // Sleeping the task allow the Sonos controller to process the subscription renewal. Otherwise, we will get an HTTP status code of 412.
+                    try! await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 
                 for await result in taskGroup {
@@ -386,6 +386,9 @@ public final class SOAPEventSession {
                         // As there is no error...
                         return(nil, nil)
                     }
+                    
+                    // Sleeping the task allow the Sonos controller to process the subscription.
+                    try! await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 
                 for await result in taskGroup {
@@ -403,10 +406,10 @@ public final class SOAPEventSession {
                 onDataReceived.send(completion: .failure(firstError.value))
             }
         }
-        // Set up subscription renewal - Renew 5 minutes before end of current subscription.
+        // Set up subscription renewal - Renew 1 minute (60 seconds) before end of current subscription.
         if renewSubscriptionTimer == nil {
             DispatchQueue.main.async {
-                self.renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: Double(self.subscriptionTimeout - 300), repeats: true) { timer in
+                self.renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: Double(self.subscriptionTimeout - 60), repeats: true) { timer in
                     self.renewSubscriptions()
                 }
             }
@@ -429,7 +432,6 @@ public final class SOAPEventSession {
             return
         }
         
-        
         Task {
             
             let allRequestsErrors = await withTaskGroup(of: (SonosService?, SOAPEventError?).self, returning: [SonosService: SOAPEventError].self) { taskGroup in
@@ -446,7 +448,6 @@ public final class SOAPEventSession {
                     taskGroup.addTask {
                         
                         var request: URLRequest
-                        
                         request = URLRequest(url: serviceURL)
                         request.httpMethod = "UNSUBSCRIBE"
                         request.addValue("\(self.subscriptionSID[index])", forHTTPHeaderField: "SID")
@@ -454,7 +455,6 @@ public final class SOAPEventSession {
                         do {
                             let (_, response) = try await URLSession.shared.data(for: request)
                             let httpResponse = response as! HTTPURLResponse
-                       
                             guard (httpResponse.statusCode == 200) else {
                                 return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                             }
@@ -465,6 +465,9 @@ public final class SOAPEventSession {
                         // As there is no error...
                         return(nil, nil)
                     }
+                    
+                    // Sleeping the task allow the Sonos controller to process the subscription removal.
+                    try! await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 
                 for await result in taskGroup {
