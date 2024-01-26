@@ -106,7 +106,7 @@ public final class SOAPEventSession {
     private var serviceEvents = [SonosEvent]()
     private var listener: NWListener!
     private var subscriptionSID = [String]()
-    private var subscriptionTimeout = 3600 // 3600 seconds = 1 hr.
+    private var subscriptionTimeout = 24 * 3600 // 3600 seconds = 1 hr.
     private var renewSubscriptionTimer: Timer?
     private var callbackURL: URL
     private var hostURL: URL?
@@ -126,6 +126,9 @@ public final class SOAPEventSession {
         setupListener()
         
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { _ in
+            
+            self.unsubscribeFromEvents()
+           
             if self.listener.state != .cancelled {
                 self.listener.cancel()
             }
@@ -133,10 +136,7 @@ public final class SOAPEventSession {
     }
     
     deinit {
-        unsubscribeFromEvents()
-        if listener.state != .cancelled {
-            listener.cancel()
-        }
+     
     }
     
     /// Set up environment.
@@ -429,11 +429,6 @@ public final class SOAPEventSession {
             return
         }
         
-        let serviceEvents = self.serviceEvents
-        let subscriptionSID = self.subscriptionSID
-        
-        self.serviceEvents.removeAll()
-        self.subscriptionSID.removeAll()
         
         Task {
             
@@ -454,13 +449,13 @@ public final class SOAPEventSession {
                         
                         request = URLRequest(url: serviceURL)
                         request.httpMethod = "UNSUBSCRIBE"
-                        request.addValue("\(subscriptionSID[index])", forHTTPHeaderField: "SID")
+                        request.addValue("\(self.subscriptionSID[index])", forHTTPHeaderField: "SID")
                         
                         do {
                             let (_, response) = try await URLSession.shared.data(for: request)
                             let httpResponse = response as! HTTPURLResponse
-                            // MARK: - Why a 412 UPnP error on last SID being unsubscribed? "Precondition Failed. An SID does not correspond to a known, un-expired subscription; or the SID header field is missing or empty."
-                            guard (httpResponse.statusCode == 200) || (httpResponse.statusCode == 412) else {
+                       
+                            guard (httpResponse.statusCode == 200) else {
                                 return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                             }
                         } catch {
@@ -487,6 +482,9 @@ public final class SOAPEventSession {
             if let firstError = allRequestsErrors.first {
                 onDataReceived.send(completion: .failure(firstError.value))
             }
+            
+            self.serviceEvents.removeAll()
+            self.subscriptionSID.removeAll()
         }
     }
 }
