@@ -442,8 +442,6 @@ public final class SOAPEventSession {
                         
                         let httpResponse = response as! HTTPURLResponse
                         
-                        print(httpResponse.statusCode)
-                        
                         guard (httpResponse.statusCode == 200) || (httpResponse.statusCode == 412) else {
                             return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                         }
