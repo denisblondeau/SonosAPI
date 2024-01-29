@@ -29,6 +29,12 @@ The issue with the official API is that you need to send network requests to Son
 
 To install this package in Xcode: Specify https://github.com/denisblondeau/SonosAPI as a package dependency. The most stable version can be found under Releases (i.e. 1.0.1, etc.). The main branch is considered experimental and is not as stable as the latest release.
 
+To use, just import the SonosAPI module in your Swift code:
+
+```bash
+  import SonosAPI
+```
+
 ### Demo
 
 To see an example on how to use this API, try the demo found at: https://github.com/denisblondeau/SonosAPIDemo
