@@ -106,7 +106,7 @@ public final class SOAPEventSession {
     private var serviceEvents = [SonosEvent]()
     private var listener: NWListener!
     private var subscriptionSID = [String]()
-    private var subscriptionTimeout = 1 * 3600 // 3600 seconds = 1 hr.
+    private var subscriptionTimeout: Double  = 1 * 3600 // 3600 seconds = 1 hr.
     private var renewSubscriptionTimer: Timer?
     private var callbackURL: URL
     private var hostURL: URL?
@@ -127,22 +127,16 @@ public final class SOAPEventSession {
         
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { _ in
             
-            self.unsubscribeFromEvents()
-           
+            self.renewSubscriptionTimer?.invalidate()
+            
+            Task {
+                await self.unsubscribeFromEvents()
+            }
+            
             if self.listener.state != .cancelled {
                 self.listener.cancel()
             }
         }
-    }
-    
-    
-    /// Set up environment.
-    public func setup(hostURL: URL) {
-        
-        self.hostURL = hostURL
-        
-        // Cancel previous subscriptions.
-        unsubscribeFromEvents()
     }
     
     /// Initialise and start the event listener.
@@ -254,7 +248,7 @@ public final class SOAPEventSession {
                 var childTaskErrors = [SonosService: SOAPEventError]()
                 
                 for (index, event) in serviceEvents.enumerated() {
-                   
+                    
                     let serviceURL = URL(string: hostURL!.description + event.eventSubscriptionEndpoint)
                     guard let serviceURL else {
                         return [event.service: .genericError("\(#function) - Cannot create service URL.")]
@@ -268,10 +262,10 @@ public final class SOAPEventSession {
                         request.addValue("Second-\(self.subscriptionTimeout)", forHTTPHeaderField: "TIMEOUT")
                         
                         do {
-                        
+                            
                             let (_, response) = try await URLSession.shared.data(for: request)
                             let httpResponse = response as! HTTPURLResponse
-        
+                            
                             guard httpResponse.statusCode == 200 else {
                                 return (event.service, .httpResponse("Cannot renew subscriptions", httpResponse.statusCode))
                             }
@@ -289,9 +283,6 @@ public final class SOAPEventSession {
                         // As there is no error...
                         return(nil, nil)
                     }
-            
-                    // Sleeping the task allow the Sonos controller to process the subscription renewal. Otherwise, we will get an HTTP status code of 412.
-                    try! await Task.sleep(nanoseconds: 1_000_000_000)
                 }
                 
                 for await result in taskGroup {
@@ -312,9 +303,12 @@ public final class SOAPEventSession {
         }
     }
     
-    /// Subscribe to Sonos events. Subscribing to events do not remove or replace  subscriptions already in place.
+    /// Subscribe to Sonos events. Subscribing to events remove/replace subscriptions already in place.
     /// - Parameter events: Sonos events to subscribe to.
-    public func subscribeToEvents(events: [SonosEvent])  {
+    public func subscribeToEvents(events: [SonosEvent], hostURL: URL) async  {
+        
+        await unsubscribeFromEvents()
+        self.hostURL = hostURL
         
         // Give time to the listener to be ready, if it just got started.
         if listener.state != .ready {
@@ -325,91 +319,86 @@ public final class SOAPEventSession {
                 }
             }
         }
-      
-        guard hostURL != nil else {
-            return
-        }
         
-        Task {
+        let allRequestsErrors = await withTaskGroup(of: (SonosService?, SOAPEventError?).self, returning: [SonosService: SOAPEventError].self) { taskGroup in
             
-            let allRequestsErrors = await withTaskGroup(of: (SonosService?, SOAPEventError?).self, returning: [SonosService: SOAPEventError].self) { taskGroup in
+            var childTaskErrors = [SonosService: SOAPEventError]()
+            
+            for event in events {
                 
-                var childTaskErrors = [SonosService: SOAPEventError]()
+                // Check if subscription for that service already exists - i.e. only susbcribe new services.
+                let isAlreadySubscribed = serviceEvents.contains { sonosEvent in
+                    return sonosEvent.service == event.service
+                }
                 
-                for event in events {
+                if isAlreadySubscribed {
+                    continue
+                } else {
+                    serviceEvents.append(event)
+                }
+                
+                let serviceURL = URL(string: hostURL.description + event.eventSubscriptionEndpoint)
+                guard let serviceURL else {
+                    return [event.service: .genericError("\(#function) - Cannot create service URL.")]
+                }
+                
+                taskGroup.addTask {
                     
-                    // Check if subscription for that service already exists - i.e. only susbcribe new services.
-                    let isAlreadySubscribed = serviceEvents.contains { sonosEvent in
-                        return sonosEvent.service == event.service
-                    }
+                    var request: URLRequest
+                    request = URLRequest(url: serviceURL)
+                    request.httpMethod = "SUBSCRIBE"
+                    request.addValue("<\(self.callbackURL.description)>", forHTTPHeaderField: "CALLBACK")
+                    request.addValue("upnp:event", forHTTPHeaderField: "NT")
+                    request.addValue("Second-\(self.subscriptionTimeout)", forHTTPHeaderField: "TIMEOUT")
                     
-                    if isAlreadySubscribed {
-                        continue
-                    } else {
-                        serviceEvents.append(event)
-                    }
-                    
-                    let serviceURL = URL(string: hostURL!.description + event.eventSubscriptionEndpoint)
-                    guard let serviceURL else {
-                        return [event.service: .genericError("\(#function) - Cannot create service URL.")]
-                    }
-                    
-                    taskGroup.addTask {
+                    do {
                         
-                        var request: URLRequest
-                        request = URLRequest(url: serviceURL)
-                        request.httpMethod = "SUBSCRIBE"
-                        request.addValue("<\(self.callbackURL.description)>", forHTTPHeaderField: "CALLBACK")
-                        request.addValue("upnp:event", forHTTPHeaderField: "NT")
-                        request.addValue("Second-\(self.subscriptionTimeout)", forHTTPHeaderField: "TIMEOUT")
+                        let (_, response) = try await URLSession.shared.data(for: request)
                         
-                        do {
-                            
-                            let (_, response) = try await URLSession.shared.data(for: request)
-                            
-                            let httpResponse = response as! HTTPURLResponse
-                            
-                            guard httpResponse.statusCode == 200 else {
-                                return (event.service, .httpResponse("Cannot subscribe to events", httpResponse.statusCode))
-                            }
-                            
-                            if let sid = httpResponse.value(forHTTPHeaderField: "SID") {
-                                self.subscriptionSID.append(sid)
-                            } else {
-                                return (event.service, .genericError("\(#function) - Cannot retrieve SID."))
-                            }
-                            
-                        } catch {
-                            return (event.service, .urlRequest(error))
+                        let httpResponse = response as! HTTPURLResponse
+                        
+                        guard httpResponse.statusCode == 200 else {
+                            return (event.service, .httpResponse("Cannot subscribe to events", httpResponse.statusCode))
                         }
                         
-                        // As there is no error...
-                        return(nil, nil)
+                        if let sid = httpResponse.value(forHTTPHeaderField: "SID") {
+                            self.subscriptionSID.append(sid)
+                        } else {
+                            return (event.service, .genericError("\(#function) - Cannot retrieve SID."))
+                        }
+                        
+                    } catch {
+                        return (event.service, .urlRequest(error))
                     }
                     
-                    // Sleeping the task allow the Sonos controller to process the subscription.
-                    try! await Task.sleep(nanoseconds: 1_000_000_000)
+                    // As there is no error...
+                    return(nil, nil)
                 }
-                
-                for await result in taskGroup {
-                    
-                    // Only include errors = and not dummy result for no error requests.
-                    if let key = result.0, let value = result.1 {
-                        childTaskErrors[key] = value
-                    }
-                }
-                return childTaskErrors
             }
             
-            // If any error, send the first one to subscriber.
-            if let firstError = allRequestsErrors.first {
-                onDataReceived.send(completion: .failure(firstError.value))
+            for await result in taskGroup {
+                
+                // Only include errors = and not dummy result for no error requests.
+                if let key = result.0, let value = result.1 {
+                    childTaskErrors[key] = value
+                }
             }
+            return childTaskErrors
         }
-        // Set up subscription renewal - Renew 1 minute (60 seconds) before end of current subscription.
+        
+        // If any error, send the first one to subscriber.
+        if let firstError = allRequestsErrors.first {
+            onDataReceived.send(completion: .failure(firstError.value))
+        }
+        
+        // Set up subscription renewal - Renew "secondsBeforeTimeout" before end of current subscription.
         if renewSubscriptionTimer == nil {
+            let secondsBeforeTimeout = 60.0
+            if subscriptionTimeout <= secondsBeforeTimeout {
+                fatalError("\(#function) subscriptionTimeout is too low.")
+            }
             DispatchQueue.main.async {
-                self.renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: Double(self.subscriptionTimeout - 60), repeats: true) { timer in
+                self.renewSubscriptionTimer = Timer.scheduledTimer(withTimeInterval: self.subscriptionTimeout - secondsBeforeTimeout, repeats: true) { timer in
                     self.renewSubscriptions()
                 }
             }
@@ -417,7 +406,7 @@ public final class SOAPEventSession {
     }
     
     /// Unsubscribe from all subscriibed events.
-    public func unsubscribeFromEvents()   {
+    public func unsubscribeFromEvents()  async {
         
         if renewSubscriptionTimer != nil {
             renewSubscriptionTimer?.invalidate()
@@ -432,63 +421,57 @@ public final class SOAPEventSession {
             return
         }
         
-        Task {
+        let allRequestsErrors = await withTaskGroup(of: (SonosService?, SOAPEventError?).self, returning: [SonosService: SOAPEventError].self) { taskGroup in
             
-            let allRequestsErrors = await withTaskGroup(of: (SonosService?, SOAPEventError?).self, returning: [SonosService: SOAPEventError].self) { taskGroup in
+            var childTaskErrors = [SonosService: SOAPEventError]()
+            
+            for (index, event) in serviceEvents.enumerated() {
                 
-                var childTaskErrors = [SonosService: SOAPEventError]()
+                let serviceURL = URL(string: hostURL!.description + event.eventSubscriptionEndpoint)
+                guard let serviceURL else {
+                    return [event.service: .genericError("\(#function) - Cannot create service URL.")]
+                }
                 
-                for (index, event) in serviceEvents.enumerated() {
-                    
-                    let serviceURL = URL(string: self.hostURL!.description + event.eventSubscriptionEndpoint)
-                    guard let serviceURL else {
-                        return [event.service: .genericError("\(#function) - Cannot create service URL.")]
-                    }
-                    
-                    taskGroup.addTask {
+                taskGroup.addTask {
+                    var request: URLRequest
+                    request = URLRequest(url: serviceURL)
+                    request.httpMethod = "UNSUBSCRIBE"
+                    request.addValue("\(self.subscriptionSID[index])", forHTTPHeaderField: "SID")
+                    do {
+                        let (_, response) = try await URLSession.shared.data(for: request)
+                        let httpResponse = response as! HTTPURLResponse
                         
-                        var request: URLRequest
-                        request = URLRequest(url: serviceURL)
-                        request.httpMethod = "UNSUBSCRIBE"
-                        request.addValue("\(self.subscriptionSID[index])", forHTTPHeaderField: "SID")
-                        
-                        do {
-                            let (_, response) = try await URLSession.shared.data(for: request)
-                            let httpResponse = response as! HTTPURLResponse
-                            guard (httpResponse.statusCode == 200) else {
-                                return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
-                            }
-                        } catch {
-                            return (event.service, .urlRequest(error))
-                            
+                        guard (httpResponse.statusCode == 200) else {
+                            return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                         }
-                        // As there is no error...
-                        return(nil, nil)
+                    } catch {
+                        return (event.service, .urlRequest(error))
+                        
                     }
-                    
-                    // Sleeping the task allow the Sonos controller to process the subscription removal.
-                    try! await Task.sleep(nanoseconds: 1_000_000_000)
+                    // As there is no error...
+                    return(nil, nil)
                 }
-                
-                for await result in taskGroup {
-                    
-                    // Only include errors = and not dummy result for no error requests.
-                    if let key = result.0, let value = result.1 {
-                        childTaskErrors[key] = value
-                    }
-                }
-                
-                return childTaskErrors
             }
             
-            // If any error, send the first one to subscriber.
-            if let firstError = allRequestsErrors.first {
-                onDataReceived.send(completion: .failure(firstError.value))
+            for await result in taskGroup {
+                
+                // Only include errors = and not dummy result for no error requests.
+                if let key = result.0, let value = result.1 {
+                    childTaskErrors[key] = value
+                }
             }
             
-            self.serviceEvents.removeAll()
-            self.subscriptionSID.removeAll()
+            return childTaskErrors
         }
+        
+        // If any error, send the first one to subscriber.
+        if let firstError = allRequestsErrors.first {
+            onDataReceived.send(completion: .failure(firstError.value))
+        }
+        
+        self.serviceEvents.removeAll()
+        self.subscriptionSID.removeAll()
+        
     }
 }
 
@@ -511,5 +494,4 @@ public enum SonosService: String  {
     case systemProperties
     case virtualLineIn
     case zoneGroupTopology
-    
 }
