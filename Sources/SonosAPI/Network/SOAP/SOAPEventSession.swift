@@ -439,9 +439,12 @@ public final class SOAPEventSession {
                     request.addValue("\(self.subscriptionSID[index])", forHTTPHeaderField: "SID")
                     do {
                         let (_, response) = try await URLSession.shared.data(for: request)
+                        
                         let httpResponse = response as! HTTPURLResponse
                         
-                        guard (httpResponse.statusCode == 200) else {
+                        print(httpResponse.statusCode)
+                        
+                        guard (httpResponse.statusCode == 200) || (httpResponse.statusCode != 412) else {
                             return (event.service, .httpResponse("Cannot unsubscribe from events", httpResponse.statusCode))
                         }
                     } catch {
