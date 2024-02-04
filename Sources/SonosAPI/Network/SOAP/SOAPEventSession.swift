@@ -283,6 +283,7 @@ public final class SOAPEventSession {
                         // As there is no error...
                         return(nil, nil)
                     }
+                        
                 }
                 
                 for await result in taskGroup {
@@ -296,9 +297,13 @@ public final class SOAPEventSession {
                 return childTaskErrors
             }
             
-            // If any error, send the first one to subscriber.
+            // If any error, send the first one to subscriber. If 412 error - subscribe again as renewal did not work.
             if let firstError = allRequestsErrors.first {
-                onDataReceived.send(completion: .failure(firstError.value))
+                if firstError.value.description.contains("412") {
+                    await subscribeToEvents(events: serviceEvents, hostURL: hostURL!)
+                } else {
+                    onDataReceived.send(completion: .failure(firstError.value))
+                }
             }
         }
     }
