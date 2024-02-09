@@ -10,7 +10,7 @@ import Foundation
 // MARK: - AVTransport
 public struct AVTransport: Codable {
     
-    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTrackURI, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
+    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
     
     public let currentTrackMetaData: CurrentTrackMetaData?
     public let nextTrackMetaData: NextTrackMetaData?
@@ -19,6 +19,7 @@ public struct AVTransport: Codable {
     public let currentCrossfadeMode, alarmRunning, snoozeRunning, restartPending: Bool
     public let numberOfTracks, currentTrack, currentSection: Int
     public let currentTrackDuration, currentMediaDuration: Date
+    public let currentTrackURI: String?
     
     enum CodingKeys: String, CodingKey {
         case transportState = "TransportState"
@@ -73,7 +74,8 @@ public struct AVTransport: Codable {
         currentTrack = Int(value ?? "") ?? 0
         value = try container.decodeIfPresent(String.self, forKey: .currentSection)
         currentSection = Int(value ?? "") ?? 0
-        currentTrackURI = try container.decode(String.self, forKey: .currentTrackURI)
+        value = try container.decodeIfPresent(String.self, forKey: .currentTrackURI)
+        currentTrackURI = value ?? ""
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "H:m:ss"
         value = try container.decode(String.self, forKey: .currentTrackDuration)
