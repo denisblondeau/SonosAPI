@@ -10,7 +10,7 @@ import Foundation
 // MARK: - AVTransport
 public struct AVTransport: Codable {
     
-    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportState, transportStatus: String
+    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportStatus: String
     
     public let currentTrackMetaData: CurrentTrackMetaData?
     public let nextTrackMetaData: NextTrackMetaData?
@@ -20,6 +20,7 @@ public struct AVTransport: Codable {
     public let numberOfTracks, currentTrack, currentSection: Int
     public let currentTrackDuration, currentMediaDuration: Date
     public let currentTrackURI: String?
+    public let transportState: TransportState
     
     enum CodingKeys: String, CodingKey {
         case transportState = "TransportState"
@@ -62,9 +63,8 @@ public struct AVTransport: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var value = try container.decodeIfPresent(String.self, forKey: .transportState)
-        transportState = value ?? ""
-        value = try container.decodeIfPresent(String.self, forKey: .currentPlayMode)
+        transportState = try container.decode(TransportState.self, forKey: .transportState)
+        var value = try container.decodeIfPresent(String.self, forKey: .currentPlayMode)
         currentPlayMode = value ?? ""
         value = try container.decodeIfPresent(String.self, forKey: .currentCrossfadeMode)
         currentCrossfadeMode = (Int(value ?? "0") == 1)
@@ -196,3 +196,10 @@ public struct TransportURIMetaData: Codable {
     }
 }
 
+// MARK: - TransportState
+public enum TransportState: String, Codable {
+    case stopped = "STOPPED"
+    case playing = "PLAYING"
+    case pausedPlayback = "PAUSED_PLAYBACK"
+    case transitioning = "TRANSITIONING"
+}
