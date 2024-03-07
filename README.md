@@ -35,10 +35,11 @@ To use, just import the SonosAPI module in your Swift code:
   import SonosAPI
 ```
 
-### Demo
+### Demos
 
-To see an example on how to use this API, try the demo found at: https://github.com/denisblondeau/SonosAPIDemo
-Another demo - forwards keypresses received from a bluetooth remote (connected to a Raspberry Pi) to Sonos: https://github.com/denisblondeau/SonosRemote
+SonosAPIDemo: MacOS/Swift example on how to use this API: https://github.com/denisblondeau/SonosAPIDemo
+
+SonosRemote: MacOS/Swift application that sends commands (Play/Pause, Previous/Next Track, Volume Up/Down) to a Sonos controller: https://github.com/denisblondeau/SonosRemote
 
 ## Roadmap
 
