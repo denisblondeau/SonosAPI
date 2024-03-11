@@ -45,8 +45,6 @@ SonosRemote: MacOS/Swift application that sends commands (Play/Pause, Previous/N
 
 - [x] Functional, basic API.
 - [x] More demos.
-- [ ] Documentation.
-- [ ] Full Sonos API implementation.
 
 ## License
 

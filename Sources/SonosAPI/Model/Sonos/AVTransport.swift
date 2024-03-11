@@ -10,16 +10,26 @@ import Foundation
 // MARK: - AVTransport
 public struct AVTransport: Codable {
     
-    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, nextTrackURI, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportStatus: String
+    public let avTransportURI, currentPlayMode, currentRecordQualityMode, currentTransportActions, currentValidPlayModes, directControlAccountID, directControlClientID, directControlIsSuspended, enqueuedTransportURI, nextAVTransportURI,nextAVTransportURIMetaData, playbackStorageMedium, possiblePlaybackStorageMedia, possibleRecordQualityModes, possibleRecordStorageMedia, recordMediumWriteStatus, recordStorageMedium, sleepTimerGeneration, transportPlaySpeed, transportStatus: String
     
     public let currentTrackMetaData: CurrentTrackMetaData?
     public let nextTrackMetaData: NextTrackMetaData?
     public let avTransportURIMetaData: TransportURIMetaData?
     public let enqueuedTransportURIMetaData: EnqueuedTransportURIMetaData?
-    public let currentCrossfadeMode, alarmRunning, snoozeRunning, restartPending: Bool
-    public let numberOfTracks, currentTrack, currentSection: Int
-    public let currentTrackDuration, currentMediaDuration: Date
+    // Set to false to prevent audio crossfade from involving this track regardless of the prevailing playback policy. Default is true.
+    public let currentCrossfadeMode: Bool
+    public let alarmRunning, snoozeRunning, restartPending: Bool
+    public let numberOfTracks: Int
+    // The number of the track on the album.
+    public let currentTrack: Int
+    public let currentSection: Int
+    // The duration of the track, in milliseconds, for example, 210000 for a 3 and a half minute song.
+    public let currentTrackDuration: Date
+    public let currentMediaDuration: Date
+    //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
     public let currentTrackURI: String?
+    //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
+    public let nextTrackURI: String?
     public let transportState: TransportState
     
     enum CodingKeys: String, CodingKey {
@@ -63,7 +73,7 @@ public struct AVTransport: Codable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var enumValue = try container.decodeIfPresent(TransportState.self, forKey: .transportState)
+        let enumValue = try container.decodeIfPresent(TransportState.self, forKey: .transportState)
         transportState = enumValue ?? TransportState.stopped
         var value = try container.decodeIfPresent(String.self, forKey: .currentPlayMode)
         currentPlayMode = value ?? ""
@@ -139,7 +149,14 @@ public struct AVTransport: Codable {
 // MARK: - CurrentTrackMetaData
 public struct CurrentTrackMetaData: Codable {
     public let res, streamContent, radioShowMd, streamInfo: String?
-    public let albumArtURI, title, class_, creator: String?
+    // A URL to an image of the album, typically a JPG or PNG.
+    public let albumArtURI: String?
+    // The name of the track.
+    public let title: String?
+    public let class_: String?
+    // The name of the artist. Maximum length of 76 characters.
+    public let creator: String?
+    // The name of the album. Maximum length of 76 characters.
     public let album: String?
     
     enum CodingKeys: String, CodingKey {
@@ -156,8 +173,10 @@ public struct CurrentTrackMetaData: Codable {
 }
 
 // MARK: - EnqueuedTransportURIMetaData
+
 public struct EnqueuedTransportURIMetaData: Codable {
     public let title, class_, desc: String?
+    // A URL to an image of the album, typically a JPG or PNG.
     public let albumArtURI: String?
     
     enum CodingKeys: String, CodingKey {
@@ -170,8 +189,15 @@ public struct EnqueuedTransportURIMetaData: Codable {
 
 // MARK: - NextTrackMetaData
 public struct NextTrackMetaData: Codable {
-    public let res, albumArtURI, title, class_: String?
-    public let creator, album: String?
+    public let res, class_: String?
+    // The name of the track.
+    public let title: String?
+    // A URL to an image of the album, typically a JPG or PNG.
+    public let albumArtURI: String?
+    // The name of the artist. Maximum length of 76 characters.
+    public let creator: String?
+    // The name of the album. Maximum length of 76 characters.
+    public let album: String?
     
     enum CodingKeys: String, CodingKey {
         case res
@@ -186,6 +212,7 @@ public struct NextTrackMetaData: Codable {
 // MARK: - TransportURIMetaData
 public struct TransportURIMetaData: Codable {
     public let title, class_: String?
+    // A URL to an image of the album, typically a JPG or PNG.
     public let albumArtURI: String?
     public let desc: String?
     
