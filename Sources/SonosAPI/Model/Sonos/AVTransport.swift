@@ -23,9 +23,8 @@ public struct AVTransport: Codable {
     // The number of the track on the album.
     public let currentTrack: Int
     public let currentSection: Int
-    // The duration of the track, in milliseconds, for example, 210000 for a 3 and a half minute song.
-    public let currentTrackDuration: Date
-    public let currentMediaDuration: Date
+    // The duration of the track. Duration is formated in H:m:ss
+    public let currentTrackDuration, currentMediaDuration: Date?
     //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
     public let currentTrackURI: String?
     //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
@@ -89,9 +88,12 @@ public struct AVTransport: Codable {
         currentTrackURI = value ?? ""
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "H:m:ss"
-        value = try container.decode(String.self, forKey: .currentTrackDuration)
-        var time = dateFormatter.date(from: value ?? "")
-        currentTrackDuration = time ?? Date()
+        value = try container.decodeIfPresent(String.self, forKey: .currentTrackDuration)
+        if let value {
+            currentTrackDuration = dateFormatter.date(from: value)
+        } else {
+            currentTrackDuration = nil
+        }
         currentTrackMetaData = try? container.decode(CurrentTrackMetaData.self, forKey: .currentTrackMetaData)
         nextTrackURI = try container.decode(String.self, forKey: .nextTrackURI)
         nextTrackMetaData = try? container.decodeIfPresent(NextTrackMetaData.self, forKey: .nextTrackMetaData)
@@ -129,8 +131,11 @@ public struct AVTransport: Codable {
         value =  try container.decodeIfPresent(String.self, forKey: .transportPlaySpeed)
         transportPlaySpeed = value ?? ""
         value = try container.decodeIfPresent(String.self, forKey: .currentMediaDuration)
-        time = dateFormatter.date(from: value ?? "")
-        currentMediaDuration = time ?? Date()
+        if let value {
+            currentMediaDuration = dateFormatter.date(from: value)
+        } else {
+            currentMediaDuration = nil
+        }
         value =  try container.decodeIfPresent(String.self, forKey: .recordStorageMedium)
         recordStorageMedium = value ?? ""
         value = try container.decodeIfPresent(String.self, forKey: .possiblePlaybackStorageMedia)
