@@ -95,7 +95,12 @@ public struct AVTransport: Codable {
             currentTrackDuration = nil
         }
         currentTrackMetaData = try? container.decode(CurrentTrackMetaData.self, forKey: .currentTrackMetaData)
-        nextTrackURI = try container.decode(String.self, forKey: .nextTrackURI)
+        value = try container.decodeIfPresent(String.self, forKey: .nextTrackURI)
+        if let value {
+            nextTrackURI = value
+        } else {
+            nextTrackURI = nil
+        }
         nextTrackMetaData = try? container.decodeIfPresent(NextTrackMetaData.self, forKey: .nextTrackMetaData)
         enqueuedTransportURI = try container.decode(String.self, forKey: .enqueuedTransportURI)
         enqueuedTransportURIMetaData = try? container.decodeIfPresent(EnqueuedTransportURIMetaData.self, forKey: .enqueuedTransportURIMetaData)
