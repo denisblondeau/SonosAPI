@@ -26,9 +26,9 @@ public struct AVTransport: Codable {
     // The duration of the track. Duration is formated in H:m:ss
     public let currentTrackDuration, currentMediaDuration: Date?
     //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
-    public let currentTrackURI: String?
+    public let currentTrackURI: String
     //  A URL to an image for the track, for example, an album cover. Typically a JPG or PNG. Maximum length of 1024 characters. Where possible, this URL should be absolute Internet-based (as opposed to local LAN) and not require authorization to retrieve.
-    public let nextTrackURI: String?
+    public let nextTrackURI: String
     public let transportState: TransportState
     
     enum CodingKeys: String, CodingKey {
@@ -96,13 +96,10 @@ public struct AVTransport: Codable {
         }
         currentTrackMetaData = try? container.decode(CurrentTrackMetaData.self, forKey: .currentTrackMetaData)
         value = try container.decodeIfPresent(String.self, forKey: .nextTrackURI)
-        if let value {
-            nextTrackURI = value
-        } else {
-            nextTrackURI = nil
-        }
+        nextTrackURI = value ?? ""
         nextTrackMetaData = try? container.decodeIfPresent(NextTrackMetaData.self, forKey: .nextTrackMetaData)
-        enqueuedTransportURI = try container.decode(String.self, forKey: .enqueuedTransportURI)
+        value = try container.decodeIfPresent(String.self, forKey: .enqueuedTransportURI)
+        enqueuedTransportURI = value ?? ""
         enqueuedTransportURIMetaData = try? container.decodeIfPresent(EnqueuedTransportURIMetaData.self, forKey: .enqueuedTransportURIMetaData)
         value = try? container.decodeIfPresent(String.self, forKey: .playbackStorageMedium)
         playbackStorageMedium = value ?? ""
